@@ -1,55 +1,36 @@
-<!Doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
-    <script type="text/javascript" src="upload/js/script.js"></script>
+    <title>File Uploading</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}"/>
 
-<body>
-<div class="upload">
-    <form method="post" enctype="multipart/form-data" id="upload-file" action="{{route('upload.file')}}">
-        @csrf
-        <div class="form-group">
-            <input type="file" name="file" placeholder="Choose File" id="file">
-            <span class="text-danger"></span>
-        </div>
-        <button type="submit" class="">Submit</button>
-    </form>
-</div>
-</body>
-<script>
-    $(document).ready(function (e) {
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-        $('#upload-file').submit(function(e) {
-            e.preventDefault();
-            var formData = new FormData(this);
-            $.ajax({
-                type:'POST',
-                url: "{{ route('upload.file')}}",
-                data: formData,
-                cache:false,
-                contentType: false,
-                processData: false,
-                success: (data) => {
-                    this.reset();
-                    alert('File has been uploaded successfully');
-                    console.log(data);
-                },
-                error: function(data){
-                    console.log(data);
-                }
-            });
-        });
-    });
-</script>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/min/dropzone.min.css" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.2.0/min/dropzone.min.js"></script>
 </head>
-</html>
+<body>
+<div class="container mt-2">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mt-2 mb-2">File Uploading </h1>
+            <form action="{{ route('store') }}" method="post" enctype="multipart/form-data" id="image-upload" class="dropzone">
+                @csrf
+                <div>
+                    <h3>Upload</h3>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+        Dropzone.options.imageUpload = {
+            maxFilesize: 2,
+            acceptedFiles: ".mp4,.mp3,.doc,.docx,.png"
+        };
 
+</script>
+
+</body>
+</html>

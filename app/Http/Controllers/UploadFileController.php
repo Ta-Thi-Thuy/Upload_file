@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\UploadFile;
+use GuzzleHttp\Promise\Create;
+use http\Client\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class UploadFileController extends Controller
 {
@@ -14,49 +18,61 @@ class UploadFileController extends Controller
      */
     public function index()
     {
-        return view('uploadFile');
+//        $files = UploadFile::all();
+//        return view('uploadFile',compact('files'));
+
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
      */
     public function create()
     {
-        //
+        return view('uploadFile');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @return false|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Routing\Redirector|string
      */
     public function store(Request $request)
     {
-        request()-> validate([
-            'file' => 'required|mimes:mp3,mp4|max:2048',
-        ]);
-        if ($files = $request->file('file')){
-            $file = $request->file->store('app/uploaded');
-            return Response()->json([
-                "success" => true,
-                "file" => $file
+        if ($files = $request->file('file')) {
+            $path = $request->file('file')->store('uploaded');
+            $name = $request->file('file')->getClientOriginalName();
+            $size = $request->file('file')->getSize();
+            $type = $request->file('file')->getMimeType();
+
+            UploadFile::create([
+                'name'=> $name,
+                'ext'=> $type,
+                'size'=> $size,
+                'path' => $path,
             ]);
 
+            return response()->json([
+                "success" => true,
+                "file" => $path
+            ], 200);
         }
-
-        return Response()->json([
+        return response()->json([
             "success" => false,
             "file" => ''
-        ]);
+        ], 400);
+
+
+
     }
+
 
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\UploadFile  $uploadFile
+     * @param \App\Models\UploadFile $uploadFile
      * @return \Illuminate\Http\Response
      */
     public function show(UploadFile $uploadFile)
@@ -67,7 +83,7 @@ class UploadFileController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Models\UploadFile  $uploadFile
+     * @param \App\Models\UploadFile $uploadFile
      * @return \Illuminate\Http\Response
      */
     public function edit(UploadFile $uploadFile)
@@ -78,8 +94,8 @@ class UploadFileController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\UploadFile  $uploadFile
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\UploadFile $uploadFile
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, UploadFile $uploadFile)
@@ -90,7 +106,7 @@ class UploadFileController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\UploadFile  $uploadFile
+     * @param \App\Models\UploadFile $uploadFile
      * @return \Illuminate\Http\Response
      */
     public function destroy(UploadFile $uploadFile)
