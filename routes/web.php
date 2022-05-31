@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 //Route::get('/', function () {
 //    return view('uploadFile');
 //});
-Route::get('/', [\App\Http\Controllers\UploadFileController::class,'index'])-> name('list');
-Route::get('create', [\App\Http\Controllers\UploadFileController::class,'create'])-> name('create');
+//Route::post('/', [\App\Http\Controllers\UploadFileController::class,'index'])-> name('list');
+Route::get('/', [\App\Http\Controllers\UploadFileController::class,'create'])-> name('create');
 Route::post('ajax/store', [\App\Http\Controllers\UploadFileController::class,'store'])-> name('store');
+Route::post('ajax/delete', [\App\Http\Controllers\UploadFileController::class,'fileDestroy'])-> name('delete');

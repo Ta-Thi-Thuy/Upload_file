@@ -19,7 +19,7 @@ class UploadFileController extends Controller
     public function index()
     {
 //        $files = UploadFile::all();
-//        return view('uploadFile',compact('files'));
+//        return view('uploadFile', compact('files'));
 
     }
 
@@ -42,29 +42,44 @@ class UploadFileController extends Controller
     public function store(Request $request)
     {
         if ($files = $request->file('file')) {
+            var_dump($files);die();
             $path = $request->file('file')->store('uploaded');
             $name = $request->file('file')->getClientOriginalName();
+            $newFileName=$fileName.time();
+            var_dump($newFileName);die();
             $size = $request->file('file')->getSize();
             $type = $request->file('file')->getMimeType();
+            $files->move(storage_path('files'), $name);
+//            var_dump($files);die();
 
-            UploadFile::create([
-                'name'=> $name,
-                'ext'=> $type,
-                'size'=> $size,
-                'path' => $path,
-            ]);
-
-            return response()->json([
-                "success" => true,
-                "file" => $path
-            ], 200);
+            $uploadFile = new UploadFile();
+            $uploadFile->name = $name;
+            $uploadFile->ext = $type;
+            $uploadFile->size = $size;
+            $uploadFile->path = $path;
+            $uploadFile->save();
+            return response()->json(['success' => $name]);
         }
         return response()->json([
             "success" => false,
             "file" => ''
         ], 400);
+    }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return false|\Illuminate\Contracts\Foundation\Application|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Routing\Redirector|string
+     */
 
+    public function fileDestroy(Request $request)
+    {
+        $filename =  $request->get('name');
+//        var_dump($filename);die();
+        UploadFile::where('name', $filename)->delete();
+
+        return $filename;
 
     }
 
