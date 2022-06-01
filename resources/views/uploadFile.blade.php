@@ -10,10 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/min/dropzone.min.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/dropzone.js"></script>
-    <link data-require="dropzone@4.0.1" data-semver="4.0.1" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/basic.css" />
-    <link data-require="dropzone@4.0.1" data-semver="4.0.1" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/dropzone.css" />
-    <script data-require="dropzone@4.0.1" data-semver="4.0.1" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/dropzone.js"></script>
-    <script data-require="dropzone@4.0.1" data-semver="4.0.1" src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/4.0.1/dropzone-amd-module.js"></script>
 
 </head>
 <body>
@@ -33,12 +29,13 @@
     </div>
 </div>
 <script>
+    var listAddedFiles =  {!! json_encode($files->toArray()) !!};
+    console.log(listAddedFiles);
     Dropzone.options.myAwesomeDropzone = {
-        maxFilesize: 2,
-        acceptedFiles: ".mp4,.mp3,.doc,.docx,.png",
+        maxFilesize: 10,
+        acceptedFiles: ".mp4,.mp3",
         addRemoveLinks: true,
-        removedfile: function(file)
-        {
+        removedfile: function (file) {
             var name = file.upload.filename;
             console.log(name);
             $.ajax({
@@ -48,28 +45,38 @@
                 type: 'POST',
                 url: 'ajax/delete',
                 data: {filename: name},
-                success: function (data){
+                success: function (data) {
                     console.log("File has been successfully removed!!");
                 },
-                error: function(e) {
+                error: function (e) {
                     console.log(e);
-                }});
+                }
+            });
             var fileRef;
             return (fileRef = file.previewElement) != null ?
                 fileRef.parentNode.removeChild(file.previewElement) : void 0;
         },
 
-        success: function(file, response)
-        {
+        init: function () {
+            let mydropzone = this;
+            listAddedFiles.forEach(item => {
+                console.log(item);
+                let mockFile = { name: item.name, ext: item.type, size: item.size, path: item.path };
+                console.log(mydropzone);
+                mydropzone.emit("addedfile", mockFile);
+                mydropzone.emit("thumbnail", mockFile, 'https://cdn.sstatic.net/Img/teams/teams-illo-free-sidebar-promo.svg?v=47faa659a05e');
+                mydropzone.emit("complete", mockFile);
+            })
+
+        },
+
+        success: function (file, response) {
             console.log(response);
         },
-        error: function(file, response)
-        {
+        error: function (file, response) {
             return false;
         }
     };
-
-
 
 
 </script>

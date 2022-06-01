@@ -18,8 +18,9 @@ class UploadFileController extends Controller
      */
     public function index()
     {
-//        $files = UploadFile::all();
-//        return view('uploadFile', compact('files'));
+        $files = UploadFile::all();
+//        dd(json_decode($files));
+        return view('uploadFile', compact('files'));
 
     }
 
@@ -42,15 +43,11 @@ class UploadFileController extends Controller
     public function store(Request $request)
     {
         if ($files = $request->file('file')) {
-            var_dump($files);die();
             $path = $request->file('file')->store('uploaded');
             $name = $request->file('file')->getClientOriginalName();
-            $newFileName=$fileName.time();
-            var_dump($newFileName);die();
             $size = $request->file('file')->getSize();
             $type = $request->file('file')->getMimeType();
             $files->move(storage_path('files'), $name);
-//            var_dump($files);die();
 
             $uploadFile = new UploadFile();
             $uploadFile->name = $name;
@@ -75,10 +72,8 @@ class UploadFileController extends Controller
 
     public function fileDestroy(Request $request)
     {
-        $filename =  $request->get('name');
-//        var_dump($filename);die();
+        $filename =  $request->get('filename');
         UploadFile::where('name', $filename)->delete();
-
         return $filename;
 
     }
